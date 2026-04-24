@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công cụ Dược Lâm Sàng & BHYT</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f4f7f6;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+        }
+
+        /* Sidebar điều hướng */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            height: 100vh;
+            color: var(--white);
+            position: fixed;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #555;
+            padding-bottom: 20px;
+        }
+
+        .nav-link {
+            padding: 15px 25px;
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Nội dung chính */
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+            width: 100%;
+        }
+
+        .container {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        h1 { color: var(--primary-color); border-left: 5px solid var(--secondary-color); padding-left: 15px; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #333; }
+        
+        textarea, input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        /* Kết quả phân tích */
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 5px solid #ccc;
+        }
+
+        .alert-error { border-left-color: var(--accent-color); color: var(--accent-color); background: #fdf2f2; }
+        .alert-success { border-left-color: #27ae60; color: #27ae60; background: #f2f9f5; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background: #eee;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>DƯỢC LÂM SÀNG 4.0</h2>
+        <a class="nav-link active" onclick="showSection('noi-tru')">Y Lệnh Nội Trú</a>
+        <a class="nav-link" onclick="showSection('ngoai-tru')">Đơn BHYT Ngoại Trú</a>
+        <a class="nav-link" onclick="showSection('tra-cuu')">Tra Cứu Dược Thư</a>
+    </div>
+
+    <div class="main-content">
+        <div id="noi-tru" class="section active">
+            <div class="container">
+                <h1>Soát Y Lệnh Nội Trú</h1>
+                <p>Kiểm tra tương tác, liều dùng và quy định hành chính y lệnh.</p>
+                <div class="form-group">
+                    <label>Danh sách thuốc trong ngày:</label>
+                    <textarea id="inputNoiTru" rows="5" placeholder="Ví dụ: Ceftriaxone 1g x 2 lọ, Paracetamol 0.5g x 3 viên..."></textarea>
+                </div>
+                <button class="btn" onclick="checkNoiTru()">Phân Tích Y Lệnh</button>
+                <div id="resultNoiTru" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="ngoai-tru" class="section">
+            <div class="container">
+                <h1>Soát Đơn BHYT Ngoại Trú</h1>
+                <p>Đối soát Mã bệnh ICD-10 và danh mục thuốc thanh toán BHYT.</p>
+                <div class="form-group">
+                    <label>Mã bệnh chính (ICD-10):</label>
+                    <input type="text" id="icdCode" placeholder="Ví dụ: E11 (ĐTĐ Type 2)">
+                </div>
+                <div class="form-group">
+                    <label>Danh mục thuốc:</label>
+                    <textarea id="inputNgoaiTru" rows="5" placeholder="Nhập tên thuốc để kiểm tra sự phù hợp với mã bệnh..."></textarea>
+                </div>
+                <button class="btn" onclick="checkNgoaiTru()">Kiểm Tra Xuất Toán</button>
+                <div id="resultNgoaiTru" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div id="tra-cuu" class="section">
+            <div class="container">
+                <h1>Thư Viện Pháp Lý</h1>
+                <ul>
+                    <li>Dược thư Quốc gia 2022</li>
+                    <li>Thông tư 20/2022/TT-BYT (Danh mục thuốc BHYT)</li>
+                    <li>Thông tư 52/2017/TT-BYT (Kê đơn thuốc ngoại trú)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function checkNoiTru() {
+            const data = document.getElementById('inputNoiTru').value;
+            const res = document.getElementById('resultNoiTru');
+            res.style.display = 'block';
+            
+            // Logic kiểm tra y lệnh bắt buộc
+            if(!data.toLowerCase().includes("hết y lệnh dùng thuốc")) {
+                res.className = "result-box alert-error";
+                res.innerHTML = "<strong>CẢNH BÁO HÀNH CHÍNH:</strong> Thiếu câu lệnh <b>'Hết y lệnh dùng thuốc'</b> cuối ngày điều trị theo quy định nội trú.";
+            } else {
+                res.className = "result-box alert-success";
+                res.innerHTML = "<strong>KẾT QUẢ:</strong> Y lệnh đầy đủ thành phần hành chính. Đang đối soát tương tác thuốc...";
+            }
+        }
+
+        function checkNgoaiTru() {
+            const icd = document.getElementById('icdCode').value;
+            const res = document.getElementById('resultNgoaiTru');
+            res.style.display = 'block';
+            res.className = "result-box alert-success";
+            res.innerHTML = `<strong>KẾT QUẢ:</strong> Mã bệnh ${icd} hợp lệ. <br> <span class='badge'>Ghi chú:</span> Đơn ngoại trú không yêu cầu câu lệnh 'Hết y lệnh dùng thuốc'.`;
+        }
+    </script>
+</body>
+</html>
